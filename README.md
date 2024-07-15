@@ -1,2 +1,2 @@
 # Database-management-DBMS-practicals
-SQL,MUSQL+Mongodb
+SQL,MYSQL+Mongodb
