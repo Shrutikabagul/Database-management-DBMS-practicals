@@ -1,0 +1,103 @@
+-- Create the propertydealers database
+CREATE DATABASE IF NOT EXISTS propertydealers;
+USE propertydealers;
+
+-- Create the Branch table
+CREATE TABLE IF NOT EXISTS Branch (
+  branchno INT PRIMARY KEY,
+  street VARCHAR(255),
+  city VARCHAR(255),
+  postcode VARCHAR(10)
+);
+
+-- Create the Staff table
+CREATE TABLE IF NOT EXISTS Staff (
+  Staffno INT PRIMARY KEY,
+  fname VARCHAR(50),
+  lname VARCHAR(50),
+  position VARCHAR(50),
+  Sex CHAR(1),
+  DOB DATE,
+  salary DECIMAL(10, 2),
+  branchno INT,
+  FOREIGN KEY (branchno) REFERENCES Branch(branchno)
+);
+
+-- Create the PropertyforRent table
+CREATE TABLE IF NOT EXISTS PropertyforRent (
+  propertyNo INT PRIMARY KEY,
+  street VARCHAR(255),
+  city VARCHAR(255),
+  Postcode VARCHAR(10),
+  Type VARCHAR(50),
+  rooms INT,
+  rent DECIMAL(10, 2),
+  ownerno INT,
+  staffno INT,
+  branchno INT,
+  FOREIGN KEY (ownerno) REFERENCES PrivateOwner(OUID),
+  FOREIGN KEY (staffno) REFERENCES Staff(Staffno),
+  FOREIGN KEY (branchno) REFERENCES Branch(branchno)
+);
+
+-- Create the Client table
+CREATE TABLE IF NOT EXISTS Client (
+  CUID INT PRIMARY KEY,
+  fName VARCHAR(50),
+  lName VARCHAR(50),
+  Rent DECIMAL(10, 2)
+);
+
+-- Create the PrivateOwner table
+CREATE TABLE IF NOT EXISTS PrivateOwner (
+  OUID INT PRIMARY KEY,
+  fName VARCHAR(50),
+  lName VARCHAR(50),
+  address VARCHAR(255)
+);
+
+-- Insert data into the Branch table
+INSERT INTO Branch VALUES
+  (1001, 'Main Street', 'Mumbai', '400001'),
+  (1002, 'Market Street', 'Pune', '411001');
+
+-- Insert data into the Staff table
+INSERT INTO Staff VALUES
+  (101, 'John', 'Doe', 'Manager', 'M', '1980-01-01', 60000, 1001),
+  (102, 'Jane', 'Smith', 'Clerk', 'F', '1985-05-15', 40000, 1002);
+
+-- Insert data into the PropertyforRent table
+INSERT INTO PropertyforRent VALUES
+  (201, 'ABC Street', 'Mumbai', '400002', 'Apartment', 2, 1200, NULL, 101, 1001),
+  (202, 'XYZ Street', 'Pune', '411002', 'House', 3, 1500, NULL, 102, 1002);
+
+-- Insert data into the Client table
+INSERT INTO Client VALUES
+  (301, 'Alice', 'Wonderland', 1300),
+  (302, 'Bob', 'Builder', 1600);
+
+-- Insert data into the PrivateOwner table
+INSERT INTO PrivateOwner VALUES
+  (401, 'Amit', 'Kumar', 'MG Road'),
+  (402, 'Anita', 'Singh', 'Market Street');
+
+-- 2. Update the street of branchNo 1001 to MG
+UPDATE Branch SET street = 'MG' WHERE branchno = 1001;
+
+-- 3. Delete the owner who has fname as ‘AMIT’
+DELETE FROM PrivateOwner WHERE fName = 'Amit';
+
+-- 4. List the clients who pay Rent more than 10000
+SELECT * FROM Client WHERE Rent > 10000;
+
+-- 5. List the name of staff who have salary greater than average salary of all staff.
+SELECT * FROM Staff WHERE salary > (SELECT AVG(salary) FROM Staff);
+
+-- 6. Find the type and rooms of properties in Pune
+SELECT Type, rooms FROM PropertyforRent WHERE city = 'Pune';
+
+-- 7. Find the name of staffs who work as salesman or saleswomen
+SELECT fname, lname FROM Staff WHERE position LIKE 'Sales%';
+
+-- 8. Find the no. of properties which are of type flat.
+SELECT COUNT(*) AS FlatCount FROM PropertyforRent WHERE Type = 'Flat';

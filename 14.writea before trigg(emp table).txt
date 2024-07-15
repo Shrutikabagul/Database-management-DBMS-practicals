@@ -1,0 +1,65 @@
+-- Create the Emp table
+CREATE TABLE IF NOT EXISTS Emp (
+    e_no INT PRIMARY KEY,
+    e_name VARCHAR(255),
+    salary DECIMAL(10, 2)
+);
+
+-- Create the Tracking table
+CREATE TABLE IF NOT EXISTS Tracking (
+    e_no INT,
+    salary DECIMAL(10, 2)
+);
+
+-- Create the BEFORE INSERT trigger
+DELIMITER //
+
+CREATE TRIGGER before_insert_emp
+BEFORE INSERT
+ON Emp FOR EACH ROW
+BEGIN
+    DECLARE new_salary DECIMAL(10, 2);
+    SET new_salary = NEW.salary;
+
+    -- Check if the salary being inserted is less than Rs. 50,000/-
+    IF new_salary < 50000 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Error: Salary must be Rs. 50,000/- or more.';
+    ELSE
+        -- Insert the new values into the Tracking table
+        INSERT INTO Tracking (e_no, salary) VALUES (NEW.e_no, new_salary);
+    END IF;
+END //
+
+DELIMITER ;
+
+-- Create the BEFORE UPDATE trigger
+DELIMITER //
+
+CREATE TRIGGER before_update_emp
+BEFORE UPDATE
+ON Emp FOR EACH ROW
+BEGIN
+    DECLARE new_salary DECIMAL(10, 2);
+    SET new_salary = NEW.salary;
+
+    -- Check if the updated salary is less than Rs. 50,000/-
+    IF new_salary < 50000 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Error: Salary must be Rs. 50,000/- or more.';
+    ELSE
+        -- Insert the new values into the Tracking table
+        INSERT INTO Tracking (e_no, salary) VALUES (NEW.e_no, new_salary);
+    END IF;
+END //
+
+DELIMITER ;
+
+-- Insert a record into Emp with a salary of Rs. 60,000/-
+INSERT INTO Emp (e_no, e_name, salary) VALUES (1, 'John Doe', 60000);
+
+-- Insert a record into Emp with a salary of Rs. 40,000/- (to trigger an error)
+INSERT INTO Emp (e_no, e_name, salary) VALUES (2, 'Jane Doe', 40000);
+
+-- Update the salary of John Doe to Rs. 45,000/- (to trigger an error)
+UPDATE Emp SET salary = 45000 WHERE e_no = 1;

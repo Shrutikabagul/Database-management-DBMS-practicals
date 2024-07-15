@@ -1,0 +1,29 @@
+import pymongo
+
+# MongoDB connection information
+host = "localhost"  # Replace with your MongoDB server host
+port = 27017  # Replace with your MongoDB server port
+database_name = "mydb"  # Replace with your database name
+
+# Create a connection to the MongoDB server
+client = pymongo.MongoClient(host, port)
+
+# Access the database
+db = client[database_name]
+
+# Access a specific collection within the database
+collection = db["mycollection"]  # Replace with your collection name
+
+# Insert a document into the collection
+data = {
+    "name": "John",
+    "age": 30,
+    "city": "ExampleCity"
+}
+
+inserted_id = collection.insert_one(data).inserted_id
+
+print(f"Inserted document with _id: {inserted_id}")
+
+# Close the MongoDB connection when done
+client.close()

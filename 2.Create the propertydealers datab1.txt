@@ -1,0 +1,234 @@
+-- Create the propertydealers database
+CREATE DATABASE IF NOT EXISTS propertydealers;
+USE propertydealers;
+
+-- Create the Branch table
+CREATE TABLE IF NOT EXISTS Branch (
+  branchno INT PRIMARY KEY,
+  street VARCHAR(255),
+  city VARCHAR(255),
+  postcode VARCHAR(10)
+);
+
+-- Create the Staff table
+CREATE TABLE IF NOT EXISTS Staff (
+  Staffno INT PRIMARY KEY,
+  fname VARCHAR(50),
+  lname VARCHAR(50),
+  position VARCHAR(50),
+  Sex CHAR(1),
+  DOB DATE,
+  salary DECIMAL(10, 2),
+  branchno INT,
+  FOREIGN KEY (branchno) REFERENCES Branch(branchno)
+);
+
+-- Create the PropertyforRent table
+CREATE TABLE IF NOT EXISTS PropertyforRent (
+  propertyNo INT PRIMARY KEY,
+  street VARCHAR(255),
+  city VARCHAR(255),
+  Postcode VARCHAR(10),
+  Type VARCHAR(50),
+  rooms INT,
+  rent DECIMAL(10, 2),
+  ownerno INT,
+  staffno INT,
+  branchno INT,
+  FOREIGN KEY (ownerno) REFERENCES PrivateOwner(OUID),
+  FOREIGN KEY (staffno) REFERENCES Staff(Staffno),
+  FOREIGN KEY (branchno) REFERENCES Branch(branchno)
+);
+
+-- Create the Client table
+CREATE TABLE IF NOT EXISTS Client (
+  CUID INT PRIMARY KEY,
+  fName VARCHAR(50),
+  lName VARCHAR(50),
+  Rent DECIMAL(10, 2)
+);
+
+-- Create the PrivateOwner table
+CREATE TABLE IF NOT EXISTS PrivateOwner (
+  OUID INT PRIMARY KEY,
+  fName VARCHAR(50),
+  lName VARCHAR(50),
+  address VARCHAR(255)
+);
+
+
+
+### 1. Insert Data:
+
+```sql
+-- Insert data into the Branch table
+INSERT INTO Branch (branchno, street, city, postcode)
+VALUES
+  (1, 'ABC Street', 'City1', '411001'),
+  (2, 'XYZ Street', 'City2', '411002');
+
+-- Insert data into the Staff table
+INSERT INTO Staff (Staffno, fname, lname, position, Sex, DOB, salary, branchno)
+VALUES
+  (101, 'John', 'Doe', 'Manager', 'M', '1980-01-01', 60000, 1),
+  (102, 'Jane', 'Smith', 'Clerk', 'F', '1985-05-15', 40000, 2);
+
+-- Insert data into the PropertyforRent table
+INSERT INTO PropertyforRent (propertyNo, street, city, Postcode, Type, rooms, rent, ownerno, staffno, branchno)
+VALUES
+  (201, 'PQR Street', 'City3', '411003', 'Apartment', 2, 1200, 301, 101, 1),
+  (202, 'LMN Street', 'City4', '411004', 'House', 3, 1500, 302, 102, 2);
+
+-- Insert data into the Client table
+INSERT INTO Client (CUID, fName, lName, Rent)
+VALUES
+  (401, 'Alice', 'Wonderland', 1300),
+  (402, 'Bob', 'Builder', 1600);
+
+-- Insert data into the PrivateOwner table
+INSERT INTO PrivateOwner (OUID, fName, lName, address)
+VALUES
+  (301, 'Charlie', 'Chaplin', 'ABC Address'),
+  (302, 'David', 'Doe', 'XYZ Address');
+```
+
+### 2. Update lname of Staff with Staffno. 106 to Shinde:
+
+```sql
+UPDATE Staff
+SET lname = 'Shinde'
+WHERE Staffno = 106;
+```
+
+### 3. Delete the Branch with Postcode 411041:
+
+```sql
+DELETE FROM Branch
+WHERE postcode = '411041';
+```
+
+### 4. List Employees with at least 2 A’s in their name:
+
+```sql
+SELECT * FROM Staff
+WHERE LENGTH(fname) - LENGTH(REPLACE(fname, 'A', '')) >= 2;
+```
+
+### 5. List Maximum Salary from Each Branch, Highest to Lowest:
+
+```sql
+SELECT branchno, MAX(salary) AS maxSalary
+FROM Staff
+GROUP BY branchno
+ORDER BY maxSalary DESC;
+```
+
+### 6. Find Clients who are also Owners:
+
+```sql
+SELECT * FROM Client
+WHERE CUID IN (SELECT OUID FROM PrivateOwner);
+```
+
+### 7. Find Owners who are not Clients:
+
+```sql
+SELECT * FROM PrivateOwner
+WHERE OUID NOT IN (SELECT CUID FROM Client);
+```
+
+### 8. Find Owners with 'C' as the Third Alphabet in Their Name:
+
+```sql
+SELECT * FROM PrivateOwner
+WHERE SUBSTRING(fName, 3, 1) = 'C';
+```
+
+********************************************************
+-- Create the propertydealers database
+CREATE DATABASE IF NOT EXISTS propertydealers;
+USE propertydealers;
+
+-- Create the Branch table
+CREATE TABLE IF NOT EXISTS Branch (
+  branchno INT PRIMARY KEY,
+  street VARCHAR(255),
+  city VARCHAR(255),
+  postcode VARCHAR(10)
+);
+
+-- Create the Staff table
+CREATE TABLE IF NOT EXISTS Staff (
+  Staffno INT PRIMARY KEY,
+  fname VARCHAR(50),
+  lname VARCHAR(50),
+  position VARCHAR(50),
+  Sex CHAR(1),
+  DOB DATE,
+  salary DECIMAL(10, 2),
+  branchno INT,
+  FOREIGN KEY (branchno) REFERENCES Branch(branchno)
+);
+
+-- Create the PropertyforRent table
+CREATE TABLE IF NOT EXISTS PropertyforRent (
+  propertyNo INT PRIMARY KEY,
+  street VARCHAR(255),
+  city VARCHAR(255),
+  Postcode VARCHAR(10),
+  Type VARCHAR(50),
+  rooms INT,
+  rent DECIMAL(10, 2),
+  ownerno INT,
+  staffno INT,
+  branchno INT,
+  FOREIGN KEY (ownerno) REFERENCES PrivateOwner(OUID),
+  FOREIGN KEY (staffno) REFERENCES Staff(Staffno),
+  FOREIGN KEY (branchno) REFERENCES Branch(branchno)
+);
+
+-- Create the Client table
+CREATE TABLE IF NOT EXISTS Client (
+  CUID INT PRIMARY KEY,
+  fName VARCHAR(50),
+  lName VARCHAR(50),
+  Rent DECIMAL(10, 2)
+);
+
+-- Create the PrivateOwner table
+CREATE TABLE IF NOT EXISTS PrivateOwner (
+  OUID INT PRIMARY KEY,
+  fName VARCHAR(50),
+  lName VARCHAR(50),
+  address VARCHAR(255)
+);
+
+-- Insert data into the Branch table
+INSERT INTO Branch (branchno, street, city, postcode)
+VALUES
+  (1, 'ABC Street', 'City1', '411001'),
+  (2, 'XYZ Street', 'City2', '411002');
+
+-- Insert data into the Staff table
+INSERT INTO Staff (Staffno, fname, lname, position, Sex, DOB, salary, branchno)
+VALUES
+  (101, 'John', 'Doe', 'Manager', 'M', '1980-01-01', 60000, 1),
+  (102, 'Jane', 'Smith', 'Clerk', 'F', '1985-05-15', 40000, 2);
+
+-- Insert data into the PropertyforRent table
+INSERT INTO PropertyforRent (propertyNo, street, city, Postcode, Type, rooms, rent, ownerno, staffno, branchno)
+VALUES
+  (201, 'PQR Street', 'City3', '411003', 'Apartment', 2, 1200, 301, 101, 1),
+  (202, 'LMN Street', 'City4', '411004', 'House', 3, 1500, 302, 102, 2);
+
+-- Insert data into the Client table
+INSERT INTO Client (CUID, fName, lName, Rent)
+VALUES
+  (401, 'Alice', 'Wonderland', 1300),
+  (402, 'Bob', 'Builder', 1600);
+
+-- Insert data into the PrivateOwner table
+INSERT INTO PrivateOwner (OUID, fName, lName, address)
+VALUES
+  (301, 'Charlie', 'Chaplin', 'ABC Address'),
+  (302, 'David', 'Doe', 'XYZ Address');

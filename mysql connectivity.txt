@@ -1,0 +1,74 @@
+Database Connectivity: Write a program to implement MySQL/Oracle database connectivity with any front end language to implement Database navigation operations (add, delete, edit etc.)
+CREATE DATABASE mydb;
+USE mydb;
+CREATE TABLE your_table (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    age INT
+);
+
+import mysql.connector
+
+# Connect to the MySQL database
+connection = mysql.connector.connect(
+    host='localhost',
+    user='your_username',
+    password='your_password',
+    database='mydb'  # Make sure to use the correct database name
+)
+
+cursor = connection.cursor()
+
+# Create a new record
+def create_record():
+    name = input("Enter name: ")
+    age = int(input("Enter age: "))
+    cursor.execute("INSERT INTO your_table (name, age) VALUES (%s, %s)", (name, age))
+    connection.commit()
+
+# Read records
+def read_records():
+    cursor.execute("SELECT * FROM your_table")
+    records = cursor.fetchall()
+    for record in records:
+        print(record)
+
+# Update a record
+def update_record():
+    record_id = int(input("Enter record ID to update: "))
+    new_age = int(input("Enter new age: "))
+    cursor.execute("UPDATE your_table SET age = %s WHERE id = %s", (new_age, record_id))
+    connection.commit()
+
+# Delete a record
+def delete_record():
+    record_id = int(input("Enter record ID to delete: "))
+    cursor.execute("DELETE FROM your_table WHERE id = %s", (record_id,))
+    connection.commit()
+
+# Menu for database navigation operations
+while True:
+    print("\nDatabase Navigation Operations:")
+    print("1. Create a record")
+    print("2. Read records")
+    print("3. Update a record")
+    print("4. Delete a record")
+    print("5. Exit")
+    choice = input("Enter your choice: ")
+
+    if choice == '1':
+        create_record()
+    elif choice == '2':
+        read_records()
+    elif choice == '3':
+        update_record()
+    elif choice == '4':
+        delete_record()
+    elif choice == '5':
+        break
+    else:
+        print("Invalid choice. Please try again.")
+
+# Close the cursor and the database connection
+cursor.close()
+connection.close()

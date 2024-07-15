@@ -1,0 +1,96 @@
+db.createCollection("student");
+db.student.insertMany([
+  {
+    "first_name": "Raj",
+    "last_name": "Sharma",
+    "gender": "male",
+    "grade_point": 85,
+    "state": "Maharashtra",
+    "city": "Mumbai"
+  },
+  {
+    "first_name": "Priya",
+    "last_name": "Patel",
+    "gender": "female",
+    "grade_point": 72,
+    "state": "Gujarat",
+    "city": "Ahmedabad"
+  },
+  {
+    "first_name": "Amit",
+    "last_name": "Kumar",
+    "gender": "male",
+    "grade_point": 78,
+    "state": "Delhi",
+    "city": "New Delhi"
+  },
+  {
+    "first_name": "Pooja",
+    "last_name": "Singh",
+    "gender": "female",
+    "grade_point": 65,
+    "state": "Uttar Pradesh",
+    "city": "Lucknow"
+  },
+  {
+    "first_name": "Rahul",
+    "last_name": "Gupta",
+    "gender": "male",
+    "grade_point": 88,
+    "state": "Haryana",
+    "city": "Gurgaon"
+  }
+]);
+
+db.createCollection("student");
+db.student.insertMany([
+  {
+    "first_name": "John",
+    "last_name": "Doe",
+    "gender": "male",
+    "grade_point": 85
+  },
+  {
+    "first_name": "Alice",
+    "last_name": "Smith",
+    "gender": "female",
+    "grade_point": 40
+  },
+  {
+    "first_name": "Bob",
+    "last_name": "Johnson",
+    "gender": "male",
+    "grade_point": 78
+  },
+  {
+    "first_name": "Riyansh",
+    "last_name": "Soniminde",
+    "gender": "male",
+    "grade_point": 30
+  }
+]);
+db.student.find({
+  $or: [
+    { "gender": "male" },
+    { "grade_point": { $gte: 31 } }
+  ]
+});
+
+db.student.updateMany(
+  { "first_name": "Riyansh" },
+  { $set: { "age": 20 } }
+);
+
+db.student.updateMany(
+  { "last_name": "Soniminde" },
+  {
+    $set: { "city": "Nagpur", "state": "MH" },
+    $setOnInsert: { "city": "Nagpur", "state": "MH" }
+  },
+  { upsert: true }
+);
+
+db.student.deleteMany({
+  "canceled": true,
+  "state": "KA"
+});

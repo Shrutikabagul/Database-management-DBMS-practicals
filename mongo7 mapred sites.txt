@@ -1,0 +1,55 @@
+Create a collection sites(url, dateofaccess). Write a MapReduce function to find the no. of times a site was accessed in a month.
+db.createCollection("sites");
+db.sites.insertMany([
+  {
+    "url": "https://example.com",
+    "dateofaccess": ISODate("2023-10-15T08:30:00Z")
+  },
+  {
+    "url": "https://example.com",
+    "dateofaccess": ISODate("2023-10-16T14:45:00Z")
+  },
+  {
+    "url": "https://example2.com",
+    "dateofaccess": ISODate("2023-10-17T10:15:00Z")
+  },
+  {
+    "url": "https://example.com",
+    "dateofaccess": ISODate("2023-11-05T09:30:00Z")
+  },
+  {
+    "url": "https://example2.com",
+    "dateofaccess": ISODate("2023-11-06T18:20:00Z")
+  }
+]);
+
+// Map function
+var mapFunction = function() {
+    var date = new Date(this.dateofaccess);
+    var year = date.getUTCFullYear();
+    var month = date.getUTCMonth() + 1; // Months are 0-based in JavaScript
+
+    // Emit the year, month, and URL as the key and 1 as the value
+    emit({ year: year, month: month, url: this.url }, 1);
+};
+
+// Reduce function
+var reduceFunction = function(key, values) {
+    // Sum the values to count the number of times the site was accessed in the month
+    return Array.sum(values);
+};
+
+// Run MapReduce
+db.sites.mapReduce(
+    mapFunction,
+    reduceFunction,
+    {
+        out: "site_access_counts"
+    }
+);
+
+db.site_access_counts.find({
+  "_id.url": "https://example.com",
+  "_id.year": 2023,
+  "_id.month": 10
+});

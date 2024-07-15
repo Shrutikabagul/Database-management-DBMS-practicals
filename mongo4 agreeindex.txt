@@ -1,0 +1,82 @@
+db.createCollection("student");
+db.student.insertMany([
+  {
+    "Rollno": 101,
+    "Name": "Alice",
+    "Class": "TE A",
+    "Div": "A",
+    "Subject": "DS",
+    "Marks": 85,
+    "Address": "Pune"
+  },
+  {
+    "Rollno": 102,
+    "Name": "Bob",
+    "Class": "TE B",
+    "Div": "B",
+    "Subject": "DS",
+    "Marks": 78,
+    "Address": "Mumbai"
+  },
+  {
+    "Rollno": 103,
+    "Name": "Charlie",
+    "Class": "TE A",
+    "Div": "A",
+    "Subject": "DS",
+    "Marks": 92,
+    "Address": "Pune"
+  },
+  {
+    "Rollno": 104,
+    "Name": "David",
+    "Class": "TE B",
+    "Div": "B",
+    "Subject": "DS",
+    "Marks": 85,
+    "Address": "Mumbai"
+  },
+  {
+    "Rollno": 105,
+    "Name": "Eve",
+    "Class": "TE A",
+    "Div": "A",
+    "Subject": "DS",
+    "Marks": 78,
+    "Address": "Pune"
+  },
+  {
+    "Rollno": 106,
+    "Name": "Frank",
+    "Class": "TE B",
+    "Div": "B",
+    "Subject": "DS",
+    "Marks": 70,
+    "Address": "Mumbai"
+  }
+]);
+
+ask 1: Find the maximum marks of students in DS who stay in the same city.
+db.student.aggregate([
+  { $match: { "Subject": "DS" } },
+  { $group: { _id: "$Address", maxMarks: { $max: "$Marks" } } }
+]);
+
+Task 2: Calculate the average of given marks.
+db.student.aggregate([
+  { $group: { _id: null, avgMarks: { $avg: "$Marks" } } }
+]);
+
+Task 3: Insert a value into an array in the resulting document.
+db.student.aggregate([
+  { $addFields: { "newField": 100 } }
+]);
+
+Task 4: Create a compound index on "Name" and "Class".
+db.student.createIndex({ "Name": 1, "Class": 1 });
+
+Task 5: Create a single index on "Name
+db.student.createIndex({ "Name": 1 });
+
+Task 6: Delete the index on "Name".
+db.student.dropIndex("Name_1");

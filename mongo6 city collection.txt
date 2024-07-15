@@ -1,0 +1,67 @@
+Create a collection City(cityname,area,population). Write a MapReduce function to find the number of cities having population less than 10 Lakhs and cities with poulation greater than 10 Lakhs g and categorize them into categories HIGHLY POPULATED AND LOW POPULATED.
+
+db.createCollection("City");
+db.City.insertMany([
+  {
+    "cityname": "Mumbai",
+    "area": "Greater Mumbai",
+    "population": 12400000
+  },
+  {
+    "cityname": "Delhi",
+    "area": "National Capital Region",
+    "population": 18900000
+  },
+  {
+    "cityname": "Bangalore",
+    "area": "Bengaluru Urban",
+    "population": 8440000
+  },
+  {
+    "cityname": "Kolkata",
+    "area": "Kolkata Metropolitan",
+    "population": 4630000
+  },
+  {
+    "cityname": "Chennai",
+    "area": "Chennai District",
+    "population": 7090000
+  },
+  {
+    "cityname": "Hyderabad",
+    "area": "Hyderabad District",
+    "population": 1010000
+  }
+]);
+
+// Map function
+var mapFunction = function() {
+    var population = this.population;
+    var category = "";
+
+    if (population <= 1000000) { // 10 Lakhs
+        category = "LOW POPULATED";
+    } else {
+        category = "HIGHLY POPULATED";
+    }
+
+    emit(category, 1);
+};
+
+// Reduce function
+var reduceFunction = function(key, values) {
+    return Array.sum(values);
+};
+
+// Run MapReduce
+db.City.mapReduce(
+    mapFunction,
+    reduceFunction,
+    {
+        out: "population_categories"
+    }
+);
+
+
+db.population_categories.find();
+

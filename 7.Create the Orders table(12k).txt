@@ -1,0 +1,108 @@
+-- Create the Orders table
+CREATE TABLE IF NOT EXISTS Orders (
+  Order_no INT PRIMARY KEY,
+  cust INT,
+  product VARCHAR(50),
+  Quantity INT,
+  amount DECIMAL(10, 2),
+  Disc DECIMAL(5, 2),
+  FOREIGN KEY (cust) REFERENCES Customers(Cust_No)
+);
+
+-- Create the Customers table
+CREATE TABLE IF NOT EXISTS Customers (
+  Cust_No INT PRIMARY KEY,
+  Company VARCHAR(50),
+  Cust_Rep INT,
+  Credit_Limit DECIMAL(10, 2),
+  FOREIGN KEY (Cust_Rep) REFERENCES Sales_Representative(Rep_no)
+);
+
+-- Create the Sales_Representative table
+CREATE TABLE IF NOT EXISTS Sales_Representative (
+  Rep_no INT PRIMARY KEY,
+  Name VARCHAR(50),
+  Re_office INT,
+  Quota DECIMAL(10, 2),
+  sales DECIMAL(10, 2)
+);
+
+-- Create the Sales_Representative table
+CREATE TABLE IF NOT EXISTS Sales_Representative (
+  Rep_no INT PRIMARY KEY,
+  Name VARCHAR(50),
+  Re_office INT,
+  Quota DECIMAL(10, 2),
+  sales DECIMAL(10, 2)
+);
+
+-- Insert data into the Sales_Representative table
+INSERT INTO Sales_Representative VALUES
+  (1, 'Rahul Sharma', 101, 50000, 45000),
+  (2, 'Priya Singh', 102, 55000, 48000);
+
+-- Create the Customers table
+CREATE TABLE IF NOT EXISTS Customers (
+  Cust_No INT PRIMARY KEY,
+  Company VARCHAR(50),
+  Cust_Rep INT,
+  Credit_Limit DECIMAL(10, 2),
+  FOREIGN KEY (Cust_Rep) REFERENCES Sales_Representative(Rep_no)
+);
+
+-- Insert data into the Customers table
+INSERT INTO Customers VALUES
+  (101, 'Taj Enterprises', 1, 100000),
+  (102, 'Mumbai Traders', 2, 120000);
+
+-- Create the Orders table
+CREATE TABLE IF NOT EXISTS Orders (
+  Order_no INT PRIMARY KEY,
+  cust INT,
+  product VARCHAR(50),
+  Quantity INT,
+  amount DECIMAL(10, 2),
+  Disc DECIMAL(5, 2),
+  FOREIGN KEY (cust) REFERENCES Customers(Cust_No)
+);
+
+-- Insert data into the Orders table
+INSERT INTO Orders VALUES
+  (1, 101, 'Laptop', 10, 30000, 0.05),
+  (2, 102, 'Mobile', 5, 28000, 0.08),
+  (3, 101, 'Tablet', 8, 32000, 0.07);
+
+
+-- Query 1: List for each customer: customer name, credit limit, rep name serving the customer, and rep sales.
+SELECT c.Company AS CustomerName, c.Credit_Limit, sr.Name AS RepName, sr.sales AS RepSales
+FROM Customers c
+JOIN Sales_Representative sr ON c.Cust_Rep = sr.Rep_no;
+
+-- Query 2: List all orders showing number and amount, and name and credit limit of the customer.
+SELECT o.Order_no, o.amount, c.Company AS CustomerName, c.Credit_Limit
+FROM Orders o
+JOIN Customers c ON o.cust = c.Cust_No;
+
+-- Query 3: Find the product-wise sale amount of products which exceed $12000.
+SELECT product, SUM(amount) AS TotalAmount
+FROM Orders
+GROUP BY product
+HAVING TotalAmount > 12000;
+
+-- Query 4: Find the names of the amount, names of customers, and names of representatives who have been involved in the sale of software.
+SELECT o.amount, c.Company AS CustomerName, sr.Name AS RepName
+FROM Orders o
+JOIN Customers c ON o.cust = c.Cust_No
+JOIN Sales_Representative sr ON c.Cust_Rep = sr.Rep_no
+WHERE o.product = 'software';
+
+-- Query 5: Find the credit limit of the company and the discount it has received.
+SELECT c.Company, c.Credit_Limit, MAX(o.Disc) AS MaxDiscount
+FROM Customers c
+JOIN Orders o ON c.Cust_No = o.cust
+GROUP BY c.Company, c.Credit_Limit;
+
+-- Query 6: Find the sales representatives who work in the same office.
+SELECT s1.Name AS Rep1, s2.Name AS Rep2, s1.Re_office AS Office
+FROM Sales_Representative s1
+JOIN Sales_Representative s2 ON s1.Re_office = s2.Re_office AND s1.Rep_no < s2.Rep_no;

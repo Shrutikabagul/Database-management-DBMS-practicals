@@ -1,0 +1,64 @@
+Create a collection "student" and make entries for 5 students with the "age" field:
+db.student.insertMany([
+  {
+    "first_name": "John",
+    "last_name": "Doe",
+    "gender": "male",
+    "class": "TE A",
+    "grade_point": 85,
+    "age": 20
+  },
+  {
+    "first_name": "Alice",
+    "last_name": "Smith",
+    "gender": "female",
+    "class": "TE B",
+    "grade_point": 40,
+    "age": 19
+  },
+  {
+    "first_name": "Bob",
+    "last_name": "Johnson",
+    "gender": "male",
+    "class": "TE A",
+    "grade_point": 78,
+    "age": 21
+  },
+  {
+    "first_name": "Bhakti",
+    "last_name": "Patel",
+    "gender": "female",
+    "class": "TE A",
+    "grade_point": 90,
+    "age": 19
+  },
+  {
+    "first_name": "David",
+    "last_name": "Brown",
+    "gender": "male",
+    "class": "TE A",
+    "grade_point": 75,
+    "age": 18
+  }
+]);
+
+db.student.find({
+  "gender": "male",
+  "class": "TE A",
+  "grade_point": { $gte: 31 }
+});
+db.student.updateMany(
+  { "first_name": "Bhakti" },
+  { $set: { "course": "MCA" } }
+);
+
+db.student.deleteMany({
+  "age": 18,
+  "gender": "male"
+});
+
+
+db.student.deleteMany({
+  "last_name": "Jadhav",
+  "class": "TE B"
+});

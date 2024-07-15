@@ -1,0 +1,168 @@
+CREATE TABLE Employee (
+  EmployeeId INT PRIMARY KEY,
+  FirstName VARCHAR(50),
+  LastName VARCHAR(50),
+  Email VARCHAR(100),
+  DepartmentId INT,
+  DateOfBirth DATE,
+  FOREIGN KEY (DepartmentId) REFERENCES Department(DepartmentId)
+);
+
+CREATE TABLE Department (
+  DepartmentId INT PRIMARY KEY,
+  DepartmentName VARCHAR(100)
+);
+
+CREATE TABLE Project (
+  ProjectId INT PRIMARY KEY,
+  ProjectName VARCHAR(100),
+  StartDate DATE,
+  EndDate DATE
+);
+
+CREATE TABLE Task (
+  TaskId INT PRIMARY KEY,
+  TaskName VARCHAR(100),
+  ProjectId INT,
+  Status VARCHAR(20),
+  DueDate DATE,
+  FOREIGN KEY (ProjectId) REFERENCES Project(ProjectId)
+);
+
+CREATE TABLE Skill (
+  SkillId INT PRIMARY KEY,
+  SkillName VARCHAR(50)
+);
+
+CREATE TABLE EmployeeSkill (
+  EmployeeSkillId INT PRIMARY KEY,
+  EmployeeId INT,
+  SkillId INT,
+  FOREIGN KEY (EmployeeId) REFERENCES Employee(EmployeeId),
+  FOREIGN KEY (SkillId) REFERENCES Skill(SkillId)
+);
+
+CREATE VIEW YoungEmployees AS
+SELECT * FROM Employee WHERE DateOfBirth > '1990-12-31';
+
+CREATE INDEX EmployeeIdIndex ON Department (DepartmentId ASC, EmployeeId ASC);
+
+CREATE SEQUENCE EmployeeIdSeq START WITH 100 INCREMENT BY 1;
+******************************************************************************************************************************************************
+
+
+-- Department Table
+CREATE TABLE Department (
+    departmentId INT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    location VARCHAR(50)
+);
+
+-- Employee Table
+CREATE TABLE Employee (
+    employeeId INT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    salary DECIMAL(10, 2),
+    departmentId INT,
+    FOREIGN KEY (departmentId) REFERENCES Department(departmentId)
+);
+
+-- Manager Table
+CREATE TABLE Manager (
+    managerId INT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL
+);
+
+-- Project Table
+CREATE TABLE Project (
+    projectId INT PRIMARY KEY,
+    projectName VARCHAR(100) NOT NULL,
+    startDate DATE
+);
+
+-- Skill Table
+CREATE TABLE Skill (
+    skillId INT PRIMARY KEY,
+    skillName VARCHAR(50) NOT NULL
+);
+
+-- Assignment Table
+CREATE TABLE Assignment (
+    assignmentId INT PRIMARY KEY,
+    employeeId INT,
+    projectId INT,
+    skillId INT,
+    FOREIGN KEY (employeeId) REFERENCES Employee(employeeId),
+    FOREIGN KEY (projectId) REFERENCES Project(projectId),
+    FOREIGN KEY (skillId) REFERENCES Skill(skillId)
+);
+
+
+-- Insert data into Department
+INSERT INTO Department (departmentId, name, location) VALUES
+(1, 'HR', 'New York'),
+(2, 'IT', 'San Francisco'),
+(3, 'Marketing', 'Los Angeles');
+
+-- Insert data into Employee
+INSERT INTO Employee (employeeId, name, salary, departmentId) VALUES
+(101, 'John Doe', 60000, 1),
+(102, 'Jane Smith', 75000, 2),
+(103, 'Bob Johnson', 55000, 1),
+(104, 'Alice Williams', 80000, 3);
+
+-- Insert data into Manager
+INSERT INTO Manager (managerId, name) VALUES
+(201, 'Manager A'),
+(202, 'Manager B'),
+(203, 'Manager C');
+
+-- Insert data into Project
+INSERT INTO Project (projectId, projectName, startDate) VALUES
+(501, 'HR System Upgrade', '2023-01-15'),
+(502, 'IT Infrastructure Overhaul', '2023-02-01'),
+(503, 'Marketing Campaign Launch', '2023-03-10');
+
+-- Insert data into Skill
+INSERT INTO Skill (skillId, skillName) VALUES
+(301, 'Java'),
+(302, 'SQL'),
+(303, 'Project Management');
+
+-- Insert data into Assignment
+INSERT INTO Assignment (assignmentId, employeeId, projectId, skillId) VALUES
+(701, 101, 501, 301),
+(702, 102, 502, 302),
+(703, 103, 501, 303),
+(704, 104, 503, 301);
+
+-- Example: Creating a view to display employees with their assigned projects
+CREATE VIEW EmployeeProjectView AS
+SELECT e.name AS employee_name, p.projectName
+FROM Employee e
+JOIN Assignment a ON e.employeeId = a.employeeId
+JOIN Project p ON a.projectId = p.projectId;
+
+-- Creating an index called EmployeeId for the Department table
+CREATE INDEX idx_EmployeeId ON Employee (employeeId, departmentId);
+
+-- Creating a sequence on EmployeeId
+CREATE SEQUENCE seq_EmployeeId START WITH 1001 INCREMENT BY 1;
+
+-- Employee Table with AUTO_INCREMENT
+CREATE TABLE Employee (
+    employeeId INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    salary DECIMAL(10, 2),
+    departmentId INT,
+    FOREIGN KEY (departmentId) REFERENCES Department(departmentId)
+);
+
+-- Insert data into Employee with AUTO_INCREMENT
+INSERT INTO Employee (name, salary, departmentId) VALUES
+('John Doe', 60000, 1),
+('Jane Smith', 75000, 2),
+('Bob Johnson', 55000, 1),
+('Alice Williams', 80000, 3);
+
+

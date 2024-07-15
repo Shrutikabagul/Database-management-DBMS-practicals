@@ -1,0 +1,170 @@
+-- Create the company database
+CREATE DATABASE IF NOT EXISTS company;
+USE company;
+
+-- Create the Emp table
+CREATE TABLE IF NOT EXISTS Emp (
+  eno INT PRIMARY KEY,
+  ename VARCHAR(50),
+  job VARCHAR(50),
+  hiredate DATE,
+  salary DECIMAL(10, 2),
+  commission DECIMAL(10, 2),
+  deptno INT,
+  CONSTRAINT fk_deptno FOREIGN KEY (deptno) REFERENCES Dept(deptno)
+);
+
+-- Create the Dept table
+CREATE TABLE IF NOT EXISTS Dept (
+  deptno INT PRIMARY KEY,
+  deptname VARCHAR(50),
+  location VARCHAR(50)
+);
+
+-- Queries
+
+-- 1. List the maximum salary paid to salesman
+SELECT MAX(salary) AS maxSalary
+FROM Emp
+WHERE job = 'Salesman';
+
+-- 2. List name of emp whose name starts with ‘I’
+SELECT ename
+FROM Emp
+WHERE ename LIKE 'I%';
+
+-- 3. List details of emp who have joined before ’30-sept-81’
+SELECT *
+FROM Emp
+WHERE hiredate < '1981-09-30';
+
+-- 4. List the emp details in descending order of their basic salary
+SELECT *
+FROM Emp
+ORDER BY salary DESC;
+
+-- 5. List the no. of emp & avg salary for emp in dept no ‘20’
+SELECT COUNT(eno) AS empCount, AVG(salary) AS avgSalary
+FROM Emp
+WHERE deptno = 20;
+
+-- 6. List the avg salary, minimum salary of the emp hiredatewise for dept no ‘10’.
+SELECT hiredate, AVG(salary) AS avgSalary, MIN(salary) AS minSalary
+FROM Emp
+WHERE deptno = 10
+GROUP BY hiredate;
+
+-- 7. List emp name and its department
+SELECT e.ename, d.deptname
+FROM Emp e
+JOIN Dept d ON e.deptno = d.deptno;
+
+-- 8. List total salary paid to each department
+SELECT d.deptname, SUM(e.salary) AS totalSalary
+FROM Emp e
+JOIN Dept d ON e.deptno = d.deptno
+GROUP BY d.deptname;
+
+-- 9. List details of employee working in ‘Dev’ department
+SELECT *
+FROM Emp
+WHERE deptno = (SELECT deptno FROM Dept WHERE deptname = 'Dev');
+
+-- 10. Update salary of all employees in deptno 10 by 5 %
+UPDATE Emp
+SET salary = salary * 1.05
+WHERE deptno = 10;
+**********************************************************************************
+
+
+
+-- Create the company database
+CREATE DATABASE IF NOT EXISTS company;
+USE company;
+
+-- Create the Dept table
+CREATE TABLE IF NOT EXISTS Dept (
+  deptno INT PRIMARY KEY,
+  deptname VARCHAR(50),
+  location VARCHAR(50)
+);
+
+-- Create the Emp table
+CREATE TABLE IF NOT EXISTS Emp (
+  eno INT PRIMARY KEY,
+  ename VARCHAR(50),
+  job VARCHAR(50),
+  hiredate DATE,
+  salary DECIMAL(10, 2),
+  commission DECIMAL(10, 2),
+  deptno INT,
+  CONSTRAINT fk_deptno FOREIGN KEY (deptno) REFERENCES Dept(deptno)
+);
+
+-- Insert data into the Dept table
+INSERT INTO Dept (deptno, deptname, location)
+VALUES
+  (10, 'Dev', 'Location1'),
+  (20, 'Sales', 'Location2');
+
+-- Insert data into the Emp table
+INSERT INTO Emp (eno, ename, job, hiredate, salary, commission, deptno)
+VALUES
+  (1, 'John Doe', 'Salesman', '1980-01-15', 50000, 2000, 20),
+  (2, 'Jane Smith', 'Manager', '1985-05-20', 70000, 3000, 10),
+  (3, 'Alice Johnson', 'Clerk', '1990-03-10', 40000, NULL, 20),
+  (4, 'Bob Williams', 'Analyst', '1982-09-25', 60000, NULL, 10);
+
+-- Queries
+
+-- 1. List the maximum salary paid to salesman
+SELECT MAX(salary) AS maxSalary
+FROM Emp
+WHERE job = 'Salesman';
+
+-- 2. List name of emp whose name starts with ‘I’
+SELECT ename
+FROM Emp
+WHERE ename LIKE 'I%';
+
+-- 3. List details of emp who have joined before ’30-sept-81’
+SELECT *
+FROM Emp
+WHERE hiredate < '1981-09-30';
+
+-- 4. List the emp details in descending order of their basic salary
+SELECT *
+FROM Emp
+ORDER BY salary DESC;
+
+-- 5. List the no. of emp & avg salary for emp in dept no ‘20’
+SELECT COUNT(eno) AS empCount, AVG(salary) AS avgSalary
+FROM Emp
+WHERE deptno = 20;
+
+-- 6. List the avg salary, minimum salary of the emp hiredatewise for dept no ‘10’.
+SELECT hiredate, AVG(salary) AS avgSalary, MIN(salary) AS minSalary
+FROM Emp
+WHERE deptno = 10
+GROUP BY hiredate;
+
+-- 7. List emp name and its department
+SELECT e.ename, d.deptname
+FROM Emp e
+JOIN Dept d ON e.deptno = d.deptno;
+
+-- 8. List total salary paid to each department
+SELECT d.deptname, SUM(e.salary) AS totalSalary
+FROM Emp e
+JOIN Dept d ON e.deptno = d.deptno
+GROUP BY d.deptname;
+
+-- 9. List details of employee working in ‘Dev’ department
+SELECT *
+FROM Emp
+WHERE deptno = (SELECT deptno FROM Dept WHERE deptname = 'Dev');
+
+-- 10. Update salary of all employees in deptno 10 by 5 %
+UPDATE Emp
+SET salary = salary * 1.05
+WHERE deptno = 10;

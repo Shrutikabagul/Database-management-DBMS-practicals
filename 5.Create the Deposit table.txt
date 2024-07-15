@@ -1,0 +1,87 @@
+-- Create the Deposit table
+CREATE TABLE IF NOT EXISTS Deposit (
+  actno INT PRIMARY KEY,
+  cname VARCHAR(50),
+  bname VARCHAR(50),
+  amount DECIMAL(10, 2),
+  adate DATE
+);
+
+-- Create the Branch table
+CREATE TABLE IF NOT EXISTS Branch (
+  bname VARCHAR(50) PRIMARY KEY,
+  city VARCHAR(50)
+);
+
+-- Create the Customers table
+CREATE TABLE IF NOT EXISTS Customers (
+  cname VARCHAR(50) PRIMARY KEY,
+  city VARCHAR(50)
+);
+
+-- Create the Borrow table
+CREATE TABLE IF NOT EXISTS Borrow (
+  loanno INT PRIMARY KEY,
+  cname VARCHAR(50),
+  bname VARCHAR(50),
+  amount DECIMAL(10, 2),
+  FOREIGN KEY (cname) REFERENCES Customers(cname),
+  FOREIGN KEY (bname) REFERENCES Branch(bname)
+);
+
+-- Insert data into the Branch table
+INSERT INTO Branch VALUES
+  ('B1', 'Bombay'),
+  ('B2', 'Delhi'),
+  ('B3', 'Pune');
+
+-- Insert data into the Customers table
+INSERT INTO Customers VALUES
+  ('Anil', 'Pune'),
+  ('Bob', 'Bombay'),
+  ('Cathy', 'Delhi');
+
+-- Insert data into the Deposit table
+INSERT INTO Deposit VALUES
+  (101, 'Anil', 'B1', 5000, '2023-01-01'),
+  (102, 'Bob', 'B2', 7000, '2023-02-15'),
+  (103, 'Cathy', 'B1', 6000, '2023-03-20');
+
+-- Insert data into the Borrow table
+INSERT INTO Borrow VALUES
+  (201, 'Anil', 'B2', 2000),
+  (202, 'Bob', 'B3', 3000),
+  (203, 'Cathy', 'B1', 4000);
+
+-- Queries
+
+-- a. Display names of all branches located in city Bombay.
+SELECT bname
+FROM Branch
+WHERE city = 'Bombay';
+
+-- b. Display account no. and amount of depositors.
+SELECT actno, amount
+FROM Deposit;
+
+-- c. Update the city of customers Anil from Pune to Mumbai
+UPDATE Customers
+SET city = 'Mumbai'
+WHERE cname = 'Anil';
+
+-- d. Find the number of depositors in the bank
+SELECT COUNT(DISTINCT cname) AS numDepositors
+FROM Deposit;
+
+-- e. Calculate Min, Max amount of customers.
+SELECT cname, MIN(amount) AS minAmount, MAX(amount) AS maxAmount
+FROM Deposit
+GROUP BY cname;
+
+-- f. Create an index on deposit table
+CREATE INDEX idx_amount ON Deposit(amount);
+
+-- g. Create View on Borrow table
+CREATE VIEW BorrowView AS
+SELECT loanno, cname, bname, amount
+FROM Borrow;

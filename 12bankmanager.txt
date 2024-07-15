@@ -1,0 +1,113 @@
+-- Create the accounts table
+CREATE TABLE IF NOT EXISTS accounts (
+    account_id INT PRIMARY KEY,
+    last_transaction_date DATE,
+    status VARCHAR(10)
+);
+
+-- Insert sample data
+INSERT INTO accounts VALUES
+    (1, '2022-11-15', 'Inactive'),
+    (2, '2022-11-20', 'Inactive'),
+    (3, '2022-11-25', 'Active'),
+    (4, '2022-11-30', 'Inactive');
+
+DELIMITER //
+
+CREATE PROCEDURE activateInactiveAccounts()
+BEGIN
+    DECLARE v_account_id INT;
+    DECLARE v_done INT DEFAULT 0;
+
+    -- Declare a cursor for the accounts that are inactive and haven't had transactions in the last 365 days
+    DECLARE cursor_inactive_accounts CURSOR FOR
+        SELECT account_id FROM accounts
+        WHERE last_transaction_date < CURDATE() - INTERVAL 365 DAY AND status = 'Inactive';
+
+    -- Declare handlers for exceptions
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done = 1;
+
+    -- Open the cursor
+    OPEN cursor_inactive_accounts;
+
+    -- Loop through the inactive accounts
+    cursor_loop: LOOP
+        -- Fetch the next account
+        FETCH cursor_inactive_accounts INTO v_account_id;
+
+        -- Check if done fetching
+        IF v_done = 1 THEN
+            LEAVE cursor_loop;
+        END IF;
+
+        -- Update the status to 'Active'
+        UPDATE accounts SET status = 'Active' WHERE account_id = v_account_id;
+    END LOOP;
+
+    -- Close the cursor
+    CLOSE cursor_inactive_accounts;
+
+    -- Display a message based on the number of rows affected
+    SELECT CONCAT('Accounts have been reactivated.') AS message;
+END //
+
+DELIMITER ;
+
+-- Call the stored procedure
+CALL activateInactiveAccounts();
+******************************************************************************************************************
+
+
+
+
+
+
+-- Create the stored procedure
+DELIMITER //
+
+CREATE PROCEDURE activateInactiveAccounts()
+BEGIN
+    DECLARE v_inactive_accounts INT DEFAULT 0;
+
+    -- Declare a cursor for the accounts that are inactive and haven't had transactions in the last 365 days
+    DECLARE cursor_inactive_accounts CURSOR FOR
+        SELECT account_id FROM accounts
+        WHERE last_transaction_date < CURDATE() - INTERVAL 365 DAY AND status = 'Inactive';
+
+    -- Declare handlers for exceptions
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_inactive_accounts = -1;
+
+    -- Open the cursor
+    OPEN cursor_inactive_accounts;
+
+    -- Fetch and update each account
+    FETCH cursor_inactive_accounts INTO v_inactive_accounts;
+    WHILE v_inactive_accounts > 0 DO
+        -- Update the status to 'Active'
+        UPDATE accounts SET status = 'Active' WHERE account_id = v_inactive_accounts;
+        
+        -- Increment the counter
+        SET v_inactive_accounts = v_inactive_accounts + 1;
+        
+        -- Fetch the next account
+        FETCH cursor_inactive_accounts INTO v_inactive_accounts;
+    END WHILE;
+
+    -- Close the cursor
+    CLOSE cursor_inactive_accounts;
+
+    -- Display a message based on the number of rows affected
+    IF v_inactive_accounts = -1 THEN
+        SELECT 'No inactive accounts were found.';
+    ELSE
+        SELECT CONCAT(v_inactive_accounts, ' accounts have been reactivated.') AS message;
+    END IF;
+END //
+
+DELIMITER ;
+
+-- Call the stored procedure
+CALL activateInactiveAccounts();
+
+-- Drop the stored procedure (optional)
+DROP PROCEDURE IF EXISTS activateInactiveAccounts;

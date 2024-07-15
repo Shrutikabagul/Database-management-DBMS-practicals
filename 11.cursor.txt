@@ -1,0 +1,71 @@
+-- Create two tables: N_RollCall and O_RollCall (Assuming they have the same structure)
+CREATE TABLE N_RollCall (
+    StudentID INT PRIMARY KEY,
+    StudentName VARCHAR(100),
+    AttendanceDate DATE
+);
+
+CREATE TABLE O_RollCall (
+    StudentID INT PRIMARY KEY,
+    StudentName VARCHAR(100),
+    AttendanceDate DATE
+);
+
+-- Insert sample data into N_RollCall
+INSERT INTO N_RollCall (StudentID, StudentName, AttendanceDate)
+VALUES
+    (1, 'John', '2023-01-15'),
+    (2, 'Alice', '2023-01-15'),
+    (3, 'Bob', '2023-01-15');
+
+-- Create a procedure to merge data from N_RollCall into O_RollCall
+DELIMITER //
+CREATE PROCEDURE MergeData()
+BEGIN
+    DECLARE v_StudentID INT;
+    DECLARE v_StudentName VARCHAR(100);
+    DECLARE v_AttendanceDate DATE;
+    
+    -- Declare a cursor for N_RollCall
+    DECLARE cur_cursor CURSOR FOR
+    SELECT StudentID, StudentName, AttendanceDate
+    FROM N_RollCall;
+    
+    -- Declare variables to handle duplicate data
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET @done = TRUE;
+    
+    -- Open the cursor
+    OPEN cur_cursor;
+    
+    -- Initialize the done flag
+    SET @done = FALSE;
+    
+    -- Loop through the cursor data
+    cursor_loop: LOOP
+        -- Fetch data from the cursor
+        FETCH cur_cursor INTO v_StudentID, v_StudentName, v_AttendanceDate;
+        
+        -- Check if the fetch was successful
+        IF @done THEN
+            LEAVE cursor_loop;
+        END IF;
+        
+        -- Check if the data already exists in O_RollCall
+        IF NOT EXISTS (SELECT 1 FROM O_RollCall WHERE StudentID = v_StudentID) THEN
+            -- Insert data into O_RollCall
+            INSERT INTO O_RollCall (StudentID, StudentName, AttendanceDate)
+            VALUES (v_StudentID, v_StudentName, v_AttendanceDate);
+        END IF;
+    END LOOP;
+    
+    -- Close the cursor
+    CLOSE cur_cursor;
+END;
+//
+DELIMITER ;
+
+-- Call the procedure to merge data
+CALL MergeData();
+
+-- Select data from O_RollCall to verify the merge
+SELECT * FROM O_RollCall;

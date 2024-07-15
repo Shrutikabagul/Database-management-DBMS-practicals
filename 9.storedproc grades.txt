@@ -1,0 +1,44 @@
+CREATE TABLE Student (
+    StudentId INT AUTO_INCREMENT PRIMARY KEY,
+    StudentName VARCHAR(100),
+    Marks INT
+);
+
+-- Inserting sample data into the Student table
+INSERT INTO Student (StudentName, Marks)
+VALUES
+    ('John', 1000),
+    ('Alice', 1450),
+    ('Bob', 950),
+    ('Eve', 850),
+    ('Charlie', 1200);
+
+
+DELIMITER //
+CREATE PROCEDURE proc_Grade(IN studentId INT, IN marks INT, OUT category VARCHAR(50))
+BEGIN
+    IF marks <= 1500 AND marks >= 990 THEN
+        SET category = 'Distinction';
+    ELSEIF marks >= 900 AND marks <= 989 THEN
+        SET category = 'First Class';
+    ELSEIF marks >= 825 AND marks <= 899 THEN
+        SET category = 'Higher Second Class';
+    ELSE
+        SET category = 'Other';
+    END IF;
+END //
+DELIMITER ;
+
+
+SET @studentId = 1;
+SET @marks = 950;
+CALL proc_Grade(@studentId, @marks, @category);
+SELECT @category;
+
+SET @studentId = 1;  -- Replace with the student's ID
+SELECT Marks FROM Student WHERE StudentId = @studentId INTO @marks;
+
+CALL proc_Grade(@studentId, @marks, @category);
+
+-- Now, @category will contain the student's category based on their marks.
+SELECT @category;

@@ -1,0 +1,92 @@
+-- Create the Borrower table
+CREATE TABLE Borrower (
+    Roll_no INT PRIMARY KEY,
+    Name VARCHAR(100),
+    DateofIssue DATE,
+    NameofBook VARCHAR(100),
+    Status CHAR(1)
+);
+
+-- Create the Fine table
+CREATE TABLE Fine (
+    Roll_no INT,
+    Date DATE,
+    Amt DECIMAL(10, 2)
+);
+
+-- Create a stored procedure for calculating fines
+DELIMITER //
+CREATE PROCEDURE CalculateFine(IN p_Roll_no INT, IN p_NameofBook VARCHAR(100))
+BEGIN
+    DECLARE v_DateofIssue DATE;
+    DECLARE v_CurrentDate DATE;
+    DECLARE v_Days INT;
+    DECLARE v_FineAmt DECIMAL(10, 2);
+    DECLARE v_Status CHAR(1);
+    
+    -- Custom exception for handling fine calculation
+    DECLARE FineException CONDITION FOR SQLSTATE '45000';
+    
+    -- Retrieve DateofIssue and Status based on Roll_no and NameofBook
+    SELECT DateofIssue, Status INTO v_DateofIssue, v_Status
+    FROM Borrower
+    WHERE Roll_no = p_Roll_no AND NameofBook = p_NameofBook;
+    
+    -- Calculate the number of days from the date of issue
+    SET v_CurrentDate = CURDATE();
+    SET v_Days = DATEDIFF(v_CurrentDate, v_DateofIssue);
+    
+    -- Calculate fine based on the number of days
+    IF v_Days >= 15 AND v_Days <= 30 THEN
+        SET v_FineAmt = v_Days * 5;
+    ELSEIF v_Days > 30 THEN
+        SET v_FineAmt = v_Days * 50;
+    ELSE
+        SET v_FineAmt = 0; -- No fine if days < 15
+    END IF;
+    
+    -- Change the status from 'I' to 'R' (assuming 'I' stands for Issued and 'R' for Returned)
+    IF v_Status = 'I' THEN
+        UPDATE Borrower
+        SET Status = 'R'
+        WHERE Roll_no = p_Roll_no AND NameofBook = p_NameofBook;
+    END IF;
+    
+    -- If fine is applicable, insert the fine details into the Fine table
+    IF v_FineAmt > 0 THEN
+        INSERT INTO Fine (Roll_no, Date, Amt)
+        VALUES (p_Roll_no, v_CurrentDate, v_FineAmt);
+    END IF;
+    
+    -- Display the fine amount
+    SELECT v_FineAmt AS FineAmount;
+    
+    -- Check if fine is applicable, and raise an exception
+    IF v_FineAmt > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Fine has been applied.';
+    END IF;
+END;
+//
+DELIMITER ;
+
+-- Insert data into the Borrower table
+INSERT INTO Borrower (Roll_no, Name, DateofIssue, NameofBook, Status)
+VALUES
+  (1, 'John Doe', '2023-01-15', 'The Great Gatsby', 'I'),
+  (2, 'Alice Wonderland', '2023-02-10', 'To Kill a Mockingbird', 'I');
+
+-- Insert data into the Fine table (Note: Assuming fines are not initially present)
+INSERT INTO Fine (Roll_no, Date, Amt)
+VALUES
+  (1, '2023-02-01', 0.00),
+  (2, '2023-03-01', 0.00);
+-- Call the CalculateFine stored procedure for the borrower with Roll_no = 1 and NameofBook = 'The Great Gatsby'
+CALL CalculateFine(1, 'The Great Gatsby');
+
+-- Call the CalculateFine stored procedure for the borrower with Roll_no = 2 and NameofBook = 'To Kill a Mockingbird'
+CALL CalculateFine(2, 'To Kill a Mockingbird');
+
+CALL CalculateFine(1, 'The Great Gatsby');
+
+SELECT * FROM Borrower WHERE Roll_no = 1;
+

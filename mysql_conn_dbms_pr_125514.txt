@@ -1,0 +1,62 @@
+package conn_demo;
+import java.sql.*;
+import java.util.Scanner;
+
+public class mysql_conn_demo {
+    public static void main(String[] args) {
+        try {
+            Class.forName("com.mysql.jdbc.Driver"); 
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/finance", "dhakad123", "dhakad123");
+            
+            Scanner sc = new Scanner(System.in);
+            System.out.print("Enter rollno: ");
+            int roll = sc.nextInt();
+            System.out.print("Enter name: ");
+            String name = sc.next();
+            
+            // Using PreparedStatement for the insert
+            PreparedStatement statInsert = con.prepareStatement("INSERT INTO user_entry VALUES (?, ?)");
+            statInsert.setInt(1, roll);
+            statInsert.setString(2, name);
+            int rowsInserted = statInsert.executeUpdate();
+            System.out.println(rowsInserted + " records inserted");
+            
+            // Using PreparedStatement for the select
+            PreparedStatement statSelect = con.prepareStatement("SELECT * FROM user_entry");
+            ResultSet rs = statSelect.executeQuery();
+            
+            while (rs.next()) {
+                System.out.println(rs.getInt(1) + "  " + rs.getString(2));
+            }
+            
+            con.close();
+        } catch (Exception e) {
+            // Print the error message in case of an exception
+            e.printStackTrace();
+        }
+    }
+}
+
+output:
+Enter rollno: 73
+Enter name: shraddha dhakad
+1 records inserted
+73  shraddha
+
+
+---------------------------------------Before insertion in mysq table------------------------
+
+mysql> use finance;
+Database changed
+
+mysql> create table user_entry(rollno int,name varchar(50));
+Query OK, 0 rows affected (0.25 sec)
+mysql> select *from user_entry;
+Empty set (0.00 sec)
+---------------------------------------after insertion in mysq table------------------------
+mysql> select *from user_entry;
++--------+----------+
+| rollno | name     |
++--------+----------+
+|     73 | shraddha |
++--------+----------+

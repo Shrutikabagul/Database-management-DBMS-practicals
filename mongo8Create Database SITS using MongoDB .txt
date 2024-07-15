@@ -1,0 +1,72 @@
+Create Database SITS using MongoDB Create following CollectionsTeachers(Tname,dno,dname,experience,salary,date_of_joining ) Students(Sname,roll_no,class)
+1. Display the department wise average salary
+2. display the no. Of employees working in each department
+3. Display the department wise total salary of departments having total salary greater than or equals to 50000/- 4. Write the queries using the different operators like max, min. Etc.
+5. Create unique index on any field for above given collections
+ 6. Create compound index on any fields for above given collections
+7. Show all the indexes created in the database SITS
+ 8. Show all the indexes created in above collections.
+
+// Create the SITS database
+use SITS
+
+// Create the Teachers collection
+db.createCollection("Teachers")
+
+// Create the Students collection
+db.createCollection("Students")
+
+// Insert sample data into Teachers collection
+db.Teachers.insertMany([
+  { Tname: "John", dno: 1, dname: "Math", experience: 5, salary: 60000, date_of_joining: ISODate("2022-01-01") },
+  { Tname: "Alice", dno: 2, dname: "Science", experience: 8, salary: 55000, date_of_joining: ISODate("2022-02-15") },
+  // ... add more teacher documents as needed
+])
+
+// Insert sample data into Students collection
+db.Students.insertMany([
+  { Sname: "Bob", roll_no: 101, class: "A" },
+  { Sname: "Eve", roll_no: 102, class: "B" },
+  // ... add more student documents as needed
+])
+
+3.db.Teachers.aggregate([
+  { $group: { _id: "$dname", avgSalary: { $avg: "$salary" } } }
+])
+
+
+4.
+db.Teachers.aggregate([
+  { $group: { _id: "$dname", count: { $sum: 1 } } }
+])
+
+5.db.Teachers.aggregate([
+  { $group: { _id: "$dname", totalSalary: { $sum: "$salary" } } },
+  { $match: { totalSalary: { $gte: 50000 } } }
+])
+
+6.// Example using max operator
+db.Teachers.find({}, { Tname: 1, salary: 1 }).sort({ salary: -1 }).limit(1)
+
+// Example using min operator
+db.Teachers.find({}, { Tname: 1, salary: 1 }).sort({ salary: 1 }).limit(1)
+
+// 7.Create unique index on roll_no field in Students collection
+db.Students.createIndex({ roll_no: 1 }, { unique: true })
+
+//8. Create compound index on dno and experience fields in Teachers collection
+db.Teachers.createIndex({ dno: 1, experience: 1 })
+
+//9. Show all indexes in the SITS database
+db.getCollectionNames().forEach(function (collection) {
+    var indexes = db[collection].getIndexes();
+    print("Indexes for " + collection + ":");
+    printjson(indexes);
+    print("---------------------------");
+});
+
+// 10.Show indexes in the Teachers collection
+db.Teachers.getIndexes()
+
+
+

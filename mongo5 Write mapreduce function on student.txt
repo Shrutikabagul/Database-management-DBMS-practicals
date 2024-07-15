@@ -1,0 +1,64 @@
+Write mapreduce function on students info collection to find the number of students who scored more than 70 marks in DBMS as “ High scores”,less than 70 marks but greater than 40 marks as “Average
+scores” and less than 40 marks as “Failed
+
+db.createCollection("students");
+db.students.insertMany([
+  {
+    "name": "Alice",
+    "DBMS": 75
+  },
+  {
+    "name": "Bob",
+    "DBMS": 60
+  },
+  {
+    "name": "Charlie",
+    "DBMS": 85
+  },
+  {
+    "name": "David",
+    "DBMS": 35
+  },
+  {
+    "name": "Eve",
+    "DBMS": 55
+  },
+  {
+    "name": "Frank",
+    "DBMS": 90
+  }
+]);
+
+// Map function
+var mapFunction = function() {
+    var score = this.DBMS;
+    var category = "";
+
+    if (score > 70) {
+        category = "High scores";
+    } else if (score > 40) {
+        category = "Average scores";
+    } else {
+        category = "Failed";
+    }
+
+    emit(category, 1);
+};
+
+// Reduce function
+var reduceFunction = function(key, values) {
+    return Array.sum(values);
+};
+
+// Run MapReduce
+db.students.mapReduce(
+    mapFunction,
+    reduceFunction,
+    {
+        out: "score_categories"
+    }
+);
+
+
+db.score_categories.find();
+
